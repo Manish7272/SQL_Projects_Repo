@@ -9,7 +9,7 @@ select count(customer_id) as "Total Customers"
 from customers;
 
 # 3. What is the average age of customers who can receive marketing emails (can_email is set to 'yes')?
-select can_email, round(avg(age),2) as Avg_Age 
+select can_email, round(avg(age)) as Avg_Age 
 from customers
 where can_email="yes";
 
@@ -31,26 +31,27 @@ from products
 where category = "food";
 
 # 7. How many orders were made in each sales channel (sales_channel column) in the orders table?
-select ord.sales_channel, count(b.order_id) as Orders
-from orders as ord , baskets as b
-where ord.order_id = b.order_id
-group by ord.sales_channel;
+select sales_channel, count(order_id) as Orders
+from orders
+group by sales_channel;
 
 # 8.What is the date of the latest order made by a customer who can receive marketing emails?
-select * from  customers as cust
+select max(ord.date_shop) as latest_order_date, cust.can_email as can_email from  customers as cust
 join orders as ord on  cust.customer_id = ord.customer_id
 and cust.can_email = "yes"
 order by ord.date_shop;
 
 
 # 9. What is the name of the country with the highest number of orders?
-select c.country_name, count(b.order_id) from country as c, orders as ord, baskets as b
-where c.country_id = ord.country_id and ord.order_id = b.order_id
+select c.country_name, count(order_id) as Highest_orders
+from country as c
+join orders using(country_id)
 group by c.country_name
+order by Highest_orders desc
 limit 1;
 
 # 10. What is the average age of customers who made orders in the 'vitamins' product category?
-select p.category,round(avg(cust.age),2) as " avg_age of customer"
+select p.category,round(avg(cust.age),2) as " avg customer age"
 from products as p, orders as ord, customers as cust, baskets as b
 where b.product_id = p.product_id 
 and b.order_id = ord.order_id
